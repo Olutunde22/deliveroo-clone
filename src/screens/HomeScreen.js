@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, Image, TextInput, ScrollView } from 'react-native'
+import { View, Text, SafeAreaView, Image, TextInput, ScrollView, RefreshControl } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { ChevronDownIcon, UserIcon, AdjustmentsVerticalIcon, MagnifyingGlassIcon } from 'react-native-heroicons/outline'
@@ -8,6 +8,7 @@ import sanityClient from '../../sanity'
 
 const HomeScreen = () => {
     const navigation = useNavigation();
+    const [refreshing, setRefreshing] = useState(false)
     const [featuredCategories, setFeaturedCategories] = useState()
 
     useLayoutEffect(() => {
@@ -15,6 +16,8 @@ const HomeScreen = () => {
             headerShown: false,
         })
     }, [])
+
+    const onRefresh = () => getFeaturedData()
 
     const getFeaturedData = async () => {
         try {
@@ -72,6 +75,11 @@ const HomeScreen = () => {
 
             {/* Body */}
             <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />}
                 contentContainerStyle={{
                     paddingBottom: 100
                 }}
@@ -81,13 +89,13 @@ const HomeScreen = () => {
                 <Categories />
                 {/* Featured Rows */}
 
-                {featuredCategories && featuredCategories.map((featuredCategory) => 
-                <FeaturedRow
-                    key={featuredCategory._id}
-                    id={featuredCategory._id}
-                    title={featuredCategory.name}
-                    description={featuredCategory.short_description}
-                />)}
+                {featuredCategories && featuredCategories.map((featuredCategory) =>
+                    <FeaturedRow
+                        key={featuredCategory._id}
+                        id={featuredCategory._id}
+                        title={featuredCategory.name}
+                        description={featuredCategory.short_description}
+                    />)}
             </ScrollView>
         </SafeAreaView>
     )
